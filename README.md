@@ -12,13 +12,14 @@ Servidor TCP concorrente aceitando múltiplos clientes desenvolvido em C. Projet
 │
 ├── logs/
 │
-├── tests/ # Testes auxiliares
+├── tests/ 
 │ └── log_sim.c
+| └── test_chat.sh
 │
-├── client/ # Código do cliente
+├── client/ 
 │ └── client.c
 │
-├── server/ # Código do servidor
+├── server/ 
 │ └── server.c
 │
 ├── libtslog.c
