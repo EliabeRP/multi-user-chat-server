@@ -1,6 +1,6 @@
 # multi-user-chat-server
 
-Servidor TCP concorrente aceitando múltiplos clientes desenvolvido em C. Projeto da disciplina Linguagem de Programação 2 com o objetivo aplicar de conceitos de concorrência em uma aplicação real.
+Servidor TCP concorrente aceitando múltiplos clientes desenvolvido em C. Projeto da disciplina Linguagem de Programação 2 com o objetivo praticar conceitos de concorrência em uma aplicação real.
 
 ## Estrutura do Projeto
 

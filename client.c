@@ -8,6 +8,7 @@
 #include <arpa/inet.h>
 
 static int sock;
+static char username[32];
 
 void* recv_thread(void *arg) {
     (void)arg;
@@ -16,40 +17,35 @@ void* recv_thread(void *arg) {
         int r = recv(sock, buf, sizeof(buf)-1, 0);
         if (r <= 0) break;
         buf[r] = '\0';
-        printf("[Servidor] %s\n", buf);
+        printf("%s", buf);
+        fflush(stdout);
     }
     return NULL;
 }
 
 int start_client(const char *host, int port) {
     sock = socket(AF_INET, SOCK_STREAM, 0);
-    if (sock < 0) {
-        perror("socket");
-        return -1;
-    }
-
-    struct sockaddr_in addr;
-    addr.sin_family = AF_INET;
-    addr.sin_port = htons(port);
+    struct sockaddr_in addr = { .sin_family = AF_INET, .sin_port = htons(port) };
     inet_pton(AF_INET, host, &addr.sin_addr);
+    connect(sock, (struct sockaddr*)&addr, sizeof(addr));
 
-    if (connect(sock, (struct sockaddr*)&addr, sizeof(addr)) < 0) {
-        perror("connect");
-        return -1;
-    }
-
-    log_info("Conectado ao servidor %s:%d", host, port);
+    printf("Digite seu nome: ");
+    fgets(username, sizeof(username), stdin);
+    username[strcspn(username, "\n")] = 0;
+    send(sock, username, strlen(username), 0);
 
     pthread_t tid;
     pthread_create(&tid, NULL, recv_thread, NULL);
     pthread_detach(tid);
 
-    char buf[512];
-    while (fgets(buf, sizeof(buf), stdin)) {
-        send(sock, buf, strlen(buf), 0);
+    char msg[512];
+    while (fgets(msg, sizeof(msg), stdin)) {
+        if (strncmp(msg, "/exit", 5) == 0) break;
+        send(sock, msg, strlen(msg), 0);
     }
 
     close(sock);
+    log_info("Cliente desconectado");
     return 0;
 }
 
@@ -62,11 +58,8 @@ int main(int argc, char *argv[]) {
     const char *host = argv[1];
     int port = atoi(argv[2]);
 
-    log_init("logs/etapa2_client.log", LOG_INFO, 1);
-
+    log_init("logs/client.log", LOG_INFO, 1);
     start_client(host, port);
-
     log_shutdown();
     return 0;
 }
-
